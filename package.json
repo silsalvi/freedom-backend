@@ -1,0 +1,22 @@
+{
+  "name": "freedom-backend",
+  "version": "1.0.0",
+  "description": "Servizio Backend per Web Application di Freedom",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silsalvi/freedom-backend.git"
+  },
+  "author": "Silvestro Salvi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/silsalvi/freedom-backend/issues"
+  },
+  "homepage": "https://github.com/silsalvi/freedom-backend#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
