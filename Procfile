@@ -1,0 +1,1 @@
+web: tsc && nodemon dist/server.js 
