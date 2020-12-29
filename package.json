@@ -1,0 +1,37 @@
+{
+  "name": "freedom-backend",
+  "version": "1.1.0",
+  "description": "Servizio Backend per Web Application di Freedom",
+  "main": "dist/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && nodemon dist/server.js -e js,json,ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/silsalvi/freedom-backend.git"
+  },
+  "author": "Silvestro Salvi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/silsalvi/freedom-backend/issues"
+  },
+  "homepage": "https://github.com/silsalvi/freedom-backend#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "ffmpeg": "0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "youtube-dl": "^3.0.2",
+    "youtube-music-api": "^1.0.6"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.9",
+    "@types/express": "^4.17.9",
+    "@types/fluent-ffmpeg": "^2.1.16",
+    "@types/youtube-dl": "^3.0.0",
+    "nodemon": "^2.0.6",
+    "tslint": "^5.12.1",
+    "typescript": "^4.1.3"
+  }
+}
