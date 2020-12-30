@@ -53,9 +53,16 @@ var youtube = new youtube_music_api_1.default();
 var YOUTUBE_ENDPOINT = "http://www.youtube.com/watch?v=";
 var port = process.env.PORT || 5000;
 var results = [];
+/**
+ * Endpoint per il log del servizio
+ */
 app.get("/", function (req, res) {
     res.status(200).send("Mi sono avviato...");
 });
+/**
+ * Usa le API di youtube per cercare i video
+ * per somiglianza con il nome del brano.
+ */
 app.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response, error_1;
     return __generator(this, function (_a) {
@@ -86,6 +93,13 @@ app.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0, v
         }
     });
 }); });
+/**
+ * A partire dal videoId recuperato dalle ricerche,
+ * crea uno stream temporaneo per il video scaricato con youtubedl.
+ * Successivamente apre un sottoprocesso in cui avvia uno script python
+ * per la conversione del video in un file mp3.
+ * Infine restituisce il file mp3 appena creato e cancella tutti i tmp.
+ */
 app.get("/video/:videoId", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var url, convPath;
     return __generator(this, function (_a) {
@@ -95,7 +109,7 @@ app.get("/video/:videoId", function (req, res) { return __awaiter(void 0, void 0
             youtube_dl_1.default(url, ["--format=18"], { cwd: __dirname })
                 .pipe(fs_1.default.createWriteStream(req.params.videoId + ".mp4", { flags: "a+" }))
                 .on("close", function () {
-                var process = child_process_1.spawn("py", [
+                var process = child_process_1.spawn("python", [
                     "converter.py",
                     req.params.videoId + ".mp4",
                 ]);
