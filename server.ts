@@ -9,9 +9,9 @@ import { spawn } from "child_process";
 const app = express();
 app.use(express.json());
 app.use(cors());
-const portLocalhost = 3000;
 const youtube = new YoutubeMusicApi();
 const YOUTUBE_ENDPOINT = "http://www.youtube.com/watch?v=";
+const port = process.env.PORT || 5000;
 let results: YoutubeResponse[] = [];
 app.get("/", (req, res) => {
   res.status(200).send("Mi sono avviato...");
@@ -63,6 +63,6 @@ app.get("/video/:videoId", async (req, res) => {
     res.status(500).send(error);
   }
 });
-app.listen(process.env.PORT || portLocalhost, () => {
-  console.log("In ascolto sulla porta " + process.env.PORT || portLocalhost);
+app.listen(port, () => {
+  console.log("In ascolto sulla porta " + port);
 });
