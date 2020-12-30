@@ -5,7 +5,6 @@ import YoutubeMusicApi from "youtube-music-api";
 import { YoutubeResponse } from "./models/youtube.model";
 import youtubedl from "youtube-dl";
 import path from "path";
-import { spawn } from "child_process";
 
 const app = express();
 app.use(express.json());
@@ -55,24 +54,13 @@ app.post("/find-brani", async (req, res) => {
  */
 app.get("/video/:videoId", async (req, res) => {
   const url = YOUTUBE_ENDPOINT + req.params.videoId;
-  const convPath = path.join(__dirname, "../", req.params.videoId + ".mp3");
+  const pathFile = path.join(__dirname, "../", req.params.videoId + ".mp4");
   try {
     youtubedl(url, ["--format=18"], { cwd: __dirname })
       .pipe(fs.createWriteStream(req.params.videoId + ".mp4", { flags: "a+" }))
       .on("close", () => {
-        const process = spawn("python", [
-          "converter.py",
-          req.params.videoId + ".mp4",
-        ]);
-        process.on("exit", (code) => {
-          console.log(
-            `file con id ${req.params.videoId} convertito correttamente `
-          );
-          if (code === 0)
-            res.sendFile(convPath, () => {
-              fs.unlinkSync(req.params.videoId + ".mp4");
-              fs.unlinkSync(req.params.videoId + ".mp3");
-            });
+        res.sendFile(pathFile, () => {
+          fs.unlinkSync(req.params.videoId + ".mp4");
         });
       });
   } catch (error) {
