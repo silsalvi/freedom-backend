@@ -49,9 +49,9 @@ var child_process_1 = require("child_process");
 var app = express_1.default();
 app.use(express_1.default.json());
 app.use(cors_1.default());
-var port = 3000;
 var youtube = new youtube_music_api_1.default();
 var YOUTUBE_ENDPOINT = "http://www.youtube.com/watch?v=";
+var port = process.env.PORT || 5000;
 var results = [];
 app.get("/", function (req, res) {
     res.status(200).send("Mi sono avviato...");
@@ -69,7 +69,14 @@ app.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0, v
             case 2:
                 response = _a.sent();
                 results = response.content;
-                res.status(200).send(results);
+                res.status(200).send(results.map(function (res) {
+                    return {
+                        titolo: res.name,
+                        id: res.videoId,
+                        artista: res.author,
+                        thumbnail: res.thumbnails.url,
+                    };
+                }));
                 return [3 /*break*/, 4];
             case 3:
                 error_1 = _a.sent();
