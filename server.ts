@@ -44,7 +44,7 @@ app.get("/video/:videoId", async (req, res) => {
     youtubedl(url, ["--format=18"], { cwd: __dirname })
       .pipe(fs.createWriteStream(req.params.videoId + ".mp4", { flags: "a+" }))
       .on("close", () => {
-        const process = spawn("py", [
+        const process = spawn("python", [
           "converter.py",
           req.params.videoId + ".mp4",
         ]);
