@@ -1,2 +1,2 @@
 pipinstall: pip install -r requirements.txt
-web: node dist/server.js
+web: tsc && node dist/server.js
