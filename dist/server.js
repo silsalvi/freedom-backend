@@ -45,7 +45,6 @@ var fs_1 = __importDefault(require("fs"));
 var youtube_music_api_1 = __importDefault(require("youtube-music-api"));
 var youtube_dl_1 = __importDefault(require("youtube-dl"));
 var path_1 = __importDefault(require("path"));
-var child_process_1 = require("child_process");
 var app = express_1.default();
 app.use(express_1.default.json());
 app.use(cors_1.default());
@@ -101,25 +100,16 @@ app.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0, v
  * Infine restituisce il file mp3 appena creato e cancella tutti i tmp.
  */
 app.get("/video/:videoId", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var url, convPath;
+    var url, pathFile;
     return __generator(this, function (_a) {
         url = YOUTUBE_ENDPOINT + req.params.videoId;
-        convPath = path_1.default.join(__dirname, "../", req.params.videoId + ".mp3");
+        pathFile = path_1.default.join(__dirname, "../", req.params.videoId + ".mp4");
         try {
             youtube_dl_1.default(url, ["--format=18"], { cwd: __dirname })
                 .pipe(fs_1.default.createWriteStream(req.params.videoId + ".mp4", { flags: "a+" }))
                 .on("close", function () {
-                var process = child_process_1.spawn("python", [
-                    "converter.py",
-                    req.params.videoId + ".mp4",
-                ]);
-                process.on("exit", function (code) {
-                    console.log("file con id " + req.params.videoId + " convertito correttamente ");
-                    if (code === 0)
-                        res.sendFile(convPath, function () {
-                            fs_1.default.unlinkSync(req.params.videoId + ".mp4");
-                            fs_1.default.unlinkSync(req.params.videoId + ".mp3");
-                        });
+                res.sendFile(pathFile, function () {
+                    fs_1.default.unlinkSync(req.params.videoId + ".mp4");
                 });
             });
         }
