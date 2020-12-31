@@ -44,7 +44,6 @@ var cors_1 = __importDefault(require("cors"));
 var fs_1 = __importDefault(require("fs"));
 var youtube_music_api_1 = __importDefault(require("youtube-music-api"));
 var youtube_dl_1 = __importDefault(require("youtube-dl"));
-var path_1 = __importDefault(require("path"));
 var app = express_1.default();
 app.use(express_1.default.json());
 app.use(cors_1.default());
@@ -100,15 +99,19 @@ app.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0, v
  * Infine restituisce il file mp3 appena creato e cancella tutti i tmp.
  */
 app.get("/video/:videoId", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var url, pathFile;
+    var fileName, url, writeStream_1;
     return __generator(this, function (_a) {
+        fileName = req.params.videoId + ".mp4";
         url = YOUTUBE_ENDPOINT + req.params.videoId;
-        pathFile = path_1.default.join(__dirname, "../", req.params.videoId + ".mp4");
         try {
-            youtube_dl_1.default(url, ["--format=18"], { cwd: __dirname })
-                .pipe(fs_1.default.createWriteStream(req.params.videoId + ".mp4", { flags: "a+" }))
-                .on("close", function () {
-                res.sendFile(pathFile, function () {
+            writeStream_1 = youtube_dl_1.default(url, ["--format=18"], {
+                cwd: __dirname,
+            })
+                .pipe(fs_1.default.createWriteStream(fileName, { flags: "a+" }))
+                .once("close", function () {
+                fs_1.default.createReadStream(writeStream_1.path, { flags: "a+" })
+                    .pipe(res)
+                    .once("finish", function () {
                     fs_1.default.unlinkSync(req.params.videoId + ".mp4");
                 });
             });

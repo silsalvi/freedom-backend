@@ -53,15 +53,19 @@ app.post("/find-brani", async (req, res) => {
  * Infine restituisce il file mp3 appena creato e cancella tutti i tmp.
  */
 app.get("/video/:videoId", async (req, res) => {
+  const fileName = req.params.videoId + ".mp4";
   const url = YOUTUBE_ENDPOINT + req.params.videoId;
-  const pathFile = path.join(__dirname, "../", req.params.videoId + ".mp4");
   try {
-    youtubedl(url, ["--format=18"], { cwd: __dirname })
-      .pipe(fs.createWriteStream(req.params.videoId + ".mp4", { flags: "a+" }))
-      .on("close", () => {
-        res.sendFile(pathFile, () => {
-          fs.unlinkSync(req.params.videoId + ".mp4");
-        });
+    const writeStream = youtubedl(url, ["--format=18"], {
+      cwd: __dirname,
+    })
+      .pipe(fs.createWriteStream(fileName, { flags: "a+" }))
+      .once("close", () => {
+        fs.createReadStream(writeStream.path, { flags: "a+" })
+          .pipe(res)
+          .once("finish", () => {
+            fs.unlinkSync(req.params.videoId + ".mp4");
+          });
       });
   } catch (error) {
     res.status(500).send(error);
