@@ -3,9 +3,7 @@ import cors from "cors";
 import fs from "fs";
 import YoutubeMusicApi from "youtube-music-api";
 import { YoutubeResponse } from "./models/youtube.model";
-import youtubedl from "youtube-dl";
-import path from "path";
-
+import ytdl, { chooseFormat } from "ytdl-core";
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -52,21 +50,10 @@ app.post("/find-brani", async (req, res) => {
  * per la conversione del video in un file mp3.
  * Infine restituisce il file mp3 appena creato e cancella tutti i tmp.
  */
-app.get("/video/:videoId", async (req, res) => {
-  const fileName = req.params.videoId + ".mp4";
+app.get("/video/:videoId", (req, res) => {
   const url = YOUTUBE_ENDPOINT + req.params.videoId;
   try {
-    const writeStream = youtubedl(url, ["--format=18"], {
-      cwd: __dirname,
-    })
-      .pipe(fs.createWriteStream(fileName, { flags: "a+" }))
-      .once("close", () => {
-        fs.createReadStream(writeStream.path, { flags: "a+" })
-          .pipe(res)
-          .once("finish", () => {
-            fs.unlinkSync(req.params.videoId + ".mp4");
-          });
-      });
+    ytdl(url, { dlChunkSize: 1 }).pipe(res);
   } catch (error) {
     res.status(500).send(error);
   }
