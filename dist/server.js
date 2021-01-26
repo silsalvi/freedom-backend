@@ -92,20 +92,21 @@ app.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0, v
 }); });
 /**
  * A partire dal videoId recuperato dalle ricerche,
- * crea uno stream temporaneo per il video scaricato con youtubedl.
- * Successivamente apre un sottoprocesso in cui avvia uno script python
- * per la conversione del video in un file mp3.
- * Infine restituisce il file mp3 appena creato e cancella tutti i tmp.
+ * crea uno stream per il video scaricato con youtubedl.
  */
-app.get("/video/:videoId", function (req, res) {
-    var url = YOUTUBE_ENDPOINT + req.params.videoId;
-    try {
-        ytdl_core_1.default(url, { dlChunkSize: 1 }).pipe(res);
-    }
-    catch (error) {
-        res.status(500).send(error);
-    }
-});
+app.get("/video/:videoId", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var url;
+    return __generator(this, function (_a) {
+        url = YOUTUBE_ENDPOINT + req.params.videoId;
+        try {
+            ytdl_core_1.default(url, { quality: 140 }).pipe(res);
+        }
+        catch (error) {
+            res.status(500).send(error);
+        }
+        return [2 /*return*/];
+    });
+}); });
 app.listen(port, function () {
     console.log("In ascolto sulla porta " + port);
 });
