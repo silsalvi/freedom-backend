@@ -99,7 +99,7 @@ app.get("/video/:videoId", function (req, res) { return __awaiter(void 0, void 0
     return __generator(this, function (_a) {
         url = YOUTUBE_ENDPOINT + req.params.videoId;
         try {
-            ytdl_core_1.default(url, { quality: 140 }).pipe(res);
+            ytdl_core_1.default(url, { quality: "lowest" }).pipe(res);
         }
         catch (error) {
             res.status(500).send(error);

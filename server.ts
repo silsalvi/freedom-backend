@@ -50,7 +50,7 @@ app.post("/find-brani", async (req, res) => {
 app.get("/video/:videoId", async (req, res) => {
   const url = YOUTUBE_ENDPOINT + req.params.videoId;
   try {
-    ytdl(url, { quality: 140 }).pipe(res);
+    ytdl(url, { quality: "lowest" }).pipe(res);
   } catch (error) {
     res.status(500).send(error);
   }
