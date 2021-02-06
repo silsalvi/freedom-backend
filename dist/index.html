@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Freedom Backend</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap");
+      body {
+        background: #1b2736;
+        font-family: "Work Sans", sans-serif;
+      }
+      p {
+        margin: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-right: -50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        text-align: center;
+      }
+
+      strong {
+        font-size: larger;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p>
+      Egregio signor/signora utente, ha sbagliato posto. Verrà reindirizzato/a
+      al player. Con permesso, <strong>a prossima vot facit attenzion!</strong>
+      <br />
+      Buona prosieguo di giornata.
+    </p>
+
+    <script>
+      setTimeout(() => {
+        window.location.href =
+          "https://freedom-music-player.herokuapp.com/home";
+      }, 10000);
+    </script>
+  </body>
+</html>
