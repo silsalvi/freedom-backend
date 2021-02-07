@@ -88,6 +88,117 @@ router.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0
         }
     });
 }); });
+router.options("/find-brani/advanced", cors_1.default());
+/**
+ * Endpoint per la ricerca avanzata.
+ * A seconda di cosa viene passato come parametro,
+ * Interroga l'API di Youtube per ottenere i campi specifici.
+ * I campi disponibili sono:
+ *      -canzone,
+ *      -video,
+ *      -album,
+ *      -playlist,
+ *      -artista
+ */
+router.post("/find-brani/advanced", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var request, response, results_1, results_2, results_3, results_4, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 12, , 13]);
+                if (Object.values(req.body).filter(function (val) { return val; }).length > 1) {
+                    res.status(500).send("La ricerca ammette un solo campo alla volta.");
+                    return [2 /*return*/];
+                }
+                return [4 /*yield*/, youtube.initalize()];
+            case 1:
+                _a.sent();
+                request = req.body;
+                response = null;
+                if (!request.album) return [3 /*break*/, 3];
+                return [4 /*yield*/, youtube.search(request.album, "album")];
+            case 2:
+                response = _a.sent();
+                results_1 = response.content;
+                res.status(200).send(results_1.map(function (res) {
+                    return {
+                        titolo: res.name,
+                        id: res.browseId,
+                        artista: res.artist,
+                        thumbnail: res.thumbnails[3] ? res.thumbnails[3].url : null,
+                    };
+                }));
+                _a.label = 3;
+            case 3:
+                if (!request.song) return [3 /*break*/, 5];
+                return [4 /*yield*/, youtube.search(request.song, "song")];
+            case 4:
+                response = _a.sent();
+                results_2 = response.content;
+                res.status(200).send(results_2.map(function (res) {
+                    return {
+                        titolo: res.name,
+                        id: res.videoId,
+                        artista: Array.isArray(res.artist)
+                            ? res.artist[0].name
+                            : res.artist.name,
+                        thumbnail: res.thumbnails[1].url,
+                    };
+                }));
+                _a.label = 5;
+            case 5:
+                if (!request.playlist) return [3 /*break*/, 7];
+                return [4 /*yield*/, youtube.search(request.playlist, "playlist")];
+            case 6:
+                response = _a.sent();
+                results_3 = response.content;
+                res.status(200).send(results_3.map(function (res) {
+                    return {
+                        titolo: res.title,
+                        id: res.browseId,
+                        totalTrack: res.trackCount,
+                        thumbnail: res.thumbnails[3] ? res.thumbnails[3].url : null,
+                    };
+                }));
+                _a.label = 7;
+            case 7:
+                if (!request.artist) return [3 /*break*/, 9];
+                return [4 /*yield*/, youtube.search(request.artist, "artist")];
+            case 8:
+                response = _a.sent();
+                results_4 = response.content;
+                res.status(200).send(results_4.map(function (res) {
+                    return {
+                        titolo: res.name,
+                        id: res.browseId,
+                        thumbnail: res.thumbnails[1] ? res.thumbnails[1].url : null,
+                    };
+                }));
+                _a.label = 9;
+            case 9:
+                if (!request.video) return [3 /*break*/, 11];
+                return [4 /*yield*/, youtube.search(request.video, "video")];
+            case 10:
+                response = _a.sent();
+                results = response.content;
+                res.status(200).send(results.map(function (res) {
+                    return {
+                        titolo: res.name,
+                        id: res.videoId,
+                        artista: res.author,
+                        thumbnail: res.thumbnails.url,
+                    };
+                }));
+                _a.label = 11;
+            case 11: return [3 /*break*/, 13];
+            case 12:
+                error_2 = _a.sent();
+                res.status(500).send(error_2);
+                return [3 /*break*/, 13];
+            case 13: return [2 /*return*/];
+        }
+    });
+}); });
 router.options("/video/:videoId", cors_1.default());
 /**
  * A partire dal videoId recuperato dalle ricerche,
@@ -109,5 +220,83 @@ router.get("/video/:videoId", function (req, res) {
         res.status(500).send(error);
     }
 });
+router.get("/getPlaylist/:id", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, response, result;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                id = req.params.id;
+                return [4 /*yield*/, youtube.initalize()];
+            case 1:
+                _a.sent();
+                return [4 /*yield*/, youtube.getPlaylist(id)];
+            case 2:
+                response = _a.sent();
+                console.log(response);
+                result = response.content;
+                res.status(200).send(result.map(function (res) {
+                    return {
+                        titolo: res.name,
+                        id: res.videoId,
+                        artista: res.author.name,
+                        thumbnail: res.thumbnails.url,
+                    };
+                }));
+                return [2 /*return*/];
+        }
+    });
+}); });
+router.get("/getAlbum/:id", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, response, result;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                id = req.params.id;
+                console.log(id);
+                return [4 /*yield*/, youtube.initalize()];
+            case 1:
+                _a.sent();
+                return [4 /*yield*/, youtube.getAlbum(id)];
+            case 2:
+                response = _a.sent();
+                result = response.tracks;
+                res.status(200).send(result.map(function (res) {
+                    return {
+                        titolo: res.name,
+                        id: res.videoId,
+                        artista: res.artistNames,
+                        thumbnail: res.thumbnails[3] ? res.thumbnails[3].url : null,
+                    };
+                }));
+                return [2 /*return*/];
+        }
+    });
+}); });
+router.post("/getSongsByArtist", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var name, response, result;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                name = req.body.name;
+                return [4 /*yield*/, youtube.initalize()];
+            case 1:
+                _a.sent();
+                return [4 /*yield*/, youtube.search(name, "song")];
+            case 2:
+                response = _a.sent();
+                result = response.content;
+                console.log(result);
+                res.status(200).send(result.map(function (res) {
+                    return {
+                        titolo: res.name,
+                        id: res.videoId,
+                        artista: name,
+                        thumbnail: res.thumbnails[0] ? res.thumbnails[0].url : null,
+                    };
+                }));
+                return [2 /*return*/];
+        }
+    });
+}); });
 exports.default = router;
 //# sourceMappingURL=routes.js.map
