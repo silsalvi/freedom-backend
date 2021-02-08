@@ -136,12 +136,15 @@ router.post("/find-brani/advanced", function (req, res) { return __awaiter(void 
                 response = _a.sent();
                 results_2 = response.content;
                 res.status(200).send(results_2.map(function (res) {
+                    var artist = Array.isArray(res.artist) && res.artist.length > 0
+                        ? res.artist[0].name
+                        : res.artist
+                            ? res.artist.name
+                            : null;
                     return {
                         titolo: res.name,
                         id: res.videoId,
-                        artista: Array.isArray(res.artist)
-                            ? res.artist[0].name
-                            : res.artist.name,
+                        artista: artist,
                         thumbnail: res.thumbnails[1].url,
                     };
                 }));
