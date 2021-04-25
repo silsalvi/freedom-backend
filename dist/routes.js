@@ -59,7 +59,7 @@ router.options("/find-brani", cors_1.default());
  * per somiglianza con il nome del brano.
  */
 router.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var response, error_1;
+    var response, results_1, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -67,21 +67,27 @@ router.post("/find-brani", function (req, res) { return __awaiter(void 0, void 0
                 return [4 /*yield*/, youtube.initalize()];
             case 1:
                 _a.sent();
-                return [4 /*yield*/, youtube.search(req.body.name, "video")];
+                return [4 /*yield*/, youtube.search(req.body.name, "song")];
             case 2:
                 response = _a.sent();
-                results = response.content;
-                res.status(200).send(results.map(function (res) {
+                results_1 = response.content;
+                res.status(200).send(results_1.map(function (res) {
+                    var artist = Array.isArray(res.artist) && res.artist.length > 0
+                        ? res.artist[0].name
+                        : res.artist
+                            ? res.artist.name
+                            : null;
                     return {
                         titolo: res.name,
                         id: res.videoId,
-                        artista: res.author,
-                        thumbnail: res.thumbnails.url,
+                        artista: artist,
+                        thumbnail: res.thumbnails[1].url,
                     };
                 }));
                 return [3 /*break*/, 4];
             case 3:
                 error_1 = _a.sent();
+                console.log(error_1);
                 res.status(500).send(error_1);
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
@@ -101,7 +107,7 @@ router.options("/find-brani/advanced", cors_1.default());
  *      -artista
  */
 router.post("/find-brani/advanced", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var request, response, results_1, results_2, results_3, results_4, error_2;
+    var request, response, results_2, results_3, results_4, results_5, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -119,8 +125,8 @@ router.post("/find-brani/advanced", function (req, res) { return __awaiter(void 
                 return [4 /*yield*/, youtube.search(request.album, "album")];
             case 2:
                 response = _a.sent();
-                results_1 = response.content;
-                res.status(200).send(results_1.map(function (res) {
+                results_2 = response.content;
+                res.status(200).send(results_2.map(function (res) {
                     return {
                         titolo: res.name,
                         id: res.browseId,
@@ -134,8 +140,8 @@ router.post("/find-brani/advanced", function (req, res) { return __awaiter(void 
                 return [4 /*yield*/, youtube.search(request.song, "song")];
             case 4:
                 response = _a.sent();
-                results_2 = response.content;
-                res.status(200).send(results_2.map(function (res) {
+                results_3 = response.content;
+                res.status(200).send(results_3.map(function (res) {
                     var artist = Array.isArray(res.artist) && res.artist.length > 0
                         ? res.artist[0].name
                         : res.artist
@@ -154,8 +160,8 @@ router.post("/find-brani/advanced", function (req, res) { return __awaiter(void 
                 return [4 /*yield*/, youtube.search(request.playlist, "playlist")];
             case 6:
                 response = _a.sent();
-                results_3 = response.content;
-                res.status(200).send(results_3.map(function (res) {
+                results_4 = response.content;
+                res.status(200).send(results_4.map(function (res) {
                     return {
                         titolo: res.title,
                         id: res.browseId,
@@ -169,8 +175,8 @@ router.post("/find-brani/advanced", function (req, res) { return __awaiter(void 
                 return [4 /*yield*/, youtube.search(request.artist, "artist")];
             case 8:
                 response = _a.sent();
-                results_4 = response.content;
-                res.status(200).send(results_4.map(function (res) {
+                results_5 = response.content;
+                res.status(200).send(results_5.map(function (res) {
                     return {
                         titolo: res.name,
                         id: res.browseId,
@@ -210,7 +216,7 @@ router.options("/video/:videoId", cors_1.default());
 router.get("/video/:videoId", function (req, res) {
     var url = YOUTUBE_ENDPOINT + req.params.videoId;
     try {
-        res.setTimeout(15000, function () {
+        res.setTimeout(10000, function () {
             var error = {
                 message: "Il video non è disponibile",
                 status: res.statusCode,

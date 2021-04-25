@@ -26,19 +26,26 @@ router.options("/find-brani", cors());
 router.post("/find-brani", async (req, res) => {
   try {
     await youtube.initalize();
-    const response = await youtube.search(req.body.name, "video");
-    results = response.content;
+    const response = await youtube.search(req.body.name, "song");
+    const results = response.content;
     res.status(200).send(
-      results.map((res) => {
+      results.map((res: any) => {
+        const artist =
+          Array.isArray(res.artist) && res.artist.length > 0
+            ? res.artist[0].name
+            : res.artist
+            ? res.artist.name
+            : null;
         return {
           titolo: res.name,
           id: res.videoId,
-          artista: res.author,
-          thumbnail: res.thumbnails.url,
+          artista: artist,
+          thumbnail: res.thumbnails[1].url,
         };
       })
     );
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
@@ -153,7 +160,7 @@ router.options("/video/:videoId", cors());
 router.get("/video/:videoId", (req, res) => {
   const url = YOUTUBE_ENDPOINT + req.params.videoId;
   try {
-    res.setTimeout(15000, () => {
+    res.setTimeout(10000, () => {
       const error: HttpError = {
         message: "Il video non è disponibile",
         status: res.statusCode,
