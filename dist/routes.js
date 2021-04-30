@@ -216,7 +216,7 @@ router.options("/video/:videoId", cors_1.default());
 router.get("/video/:videoId", function (req, res) {
     var url = YOUTUBE_ENDPOINT + req.params.videoId;
     try {
-        res.setTimeout(10000, function () {
+        res.setTimeout(20000, function () {
             var error = {
                 message: "Il video non è disponibile",
                 status: res.statusCode,
