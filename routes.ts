@@ -157,10 +157,10 @@ router.options("/video/:videoId", cors());
  * A partire dal videoId recuperato dalle ricerche,
  * crea uno stream per il video scaricato con youtubedl.
  */
-router.get("/video/:videoId", (req, res) => {
+router.get("/video/:videoId", async (req, res) => {
   const url = YOUTUBE_ENDPOINT + req.params.videoId;
   try {
-    res.setTimeout(10000, () => {
+    res.setTimeout(20000, () => {
       const error: HttpError = {
         message: "Il video non è disponibile",
         status: res.statusCode,
