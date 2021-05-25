@@ -1,24 +1,24 @@
 import express from "express";
 import ytdl from "ytdl-core";
 import YoutubeMusicApi from "youtube-music-api";
-import cors from "cors";
 import { YoutubeResponse } from "./models/youtube.model";
 import { HttpError } from "./models/http-error.model";
 import { YoutubeSearch } from "./models/advanced-search.model";
+import { SongController } from "./songs.controller";
 
 const youtube = new YoutubeMusicApi();
 const YOUTUBE_ENDPOINT = "http://www.youtube.com/watch?v=";
 const router = express.Router();
-
+const songController = SongController.getInstance();
 let results: YoutubeResponse[] = [];
+
 /**
- * Endpoint per il log del servizio
+ * Endpoint per restituire la pagina html di redirect all'app di frontend.
  */
 router.get("/", (req, res) => {
   res.status(200).sendFile(__dirname + "/index.html");
 });
 
-router.options("/find-brani", cors());
 /**
  * Usa le API di youtube per cercare i video
  * per somiglianza con il nome del brano.
@@ -28,29 +28,14 @@ router.post("/find-brani", async (req, res) => {
     await youtube.initalize();
     const response = await youtube.search(req.body.name, "song");
     const results = response.content;
-    res.status(200).send(
-      results.map((res: any) => {
-        const artist =
-          Array.isArray(res.artist) && res.artist.length > 0
-            ? res.artist[0].name
-            : res.artist
-            ? res.artist.name
-            : null;
-        return {
-          titolo: res.name,
-          id: res.videoId,
-          artista: artist,
-          thumbnail: res.thumbnails[1].url,
-        };
-      })
-    );
+    songController.extractSongFromResponse(results).then((response) => {
+      res.status(200).send(response);
+    });
   } catch (error) {
-    console.log(error);
     res.status(500).send(error);
   }
 });
 
-router.options("/find-brani/advanced", cors());
 /**
  * Endpoint per la ricerca avanzata.
  * A seconda di cosa viene passato come parametro,
@@ -71,88 +56,47 @@ router.post("/find-brani/advanced", async (req, res) => {
     await youtube.initalize();
     const request: YoutubeSearch = req.body;
     let response = null;
+
     if (request.album) {
       response = await youtube.search(request.album, "album");
       const results = response.content;
-      res.status(200).send(
-        results.map((res: any) => {
-          return {
-            titolo: res.name,
-            id: res.browseId,
-            artista: res.artist,
-            thumbnail: res.thumbnails[3] ? res.thumbnails[3].url : null,
-          };
-        })
-      );
+      res.status(200).send(songController.extractAlbumFromResponse(results));
     }
+
     if (request.song) {
+      await youtube.initalize();
       response = await youtube.search(request.song, "song");
       const results = response.content;
-      res.status(200).send(
-        results.map((res: any) => {
-          const artist =
-            Array.isArray(res.artist) && res.artist.length > 0
-              ? res.artist[0].name
-              : res.artist
-              ? res.artist.name
-              : null;
-          return {
-            titolo: res.name,
-            id: res.videoId,
-            artista: artist,
-            thumbnail: res.thumbnails[1].url,
-          };
-        })
-      );
+      songController.extractSongFromResponse(results).then((response) => {
+        res.status(200).send(response);
+      });
     }
+
     if (request.playlist) {
       response = await youtube.search(request.playlist, "playlist");
       const results = response.content;
-      res.status(200).send(
-        results.map((res: any) => {
-          return {
-            titolo: res.title,
-            id: res.browseId,
-            totalTrack: res.trackCount,
-            thumbnail: res.thumbnails[3] ? res.thumbnails[3].url : null,
-          };
-        })
-      );
+      res.status(200).send(songController.extractPlaylistFromResponse(results));
     }
+
     if (request.artist) {
       response = await youtube.search(request.artist, "artist");
       const results = response.content;
-
-      res.status(200).send(
-        results.map((res: any) => {
-          return {
-            titolo: res.name,
-            id: res.browseId,
-            thumbnail: res.thumbnails[1] ? res.thumbnails[1].url : null,
-          };
-        })
-      );
+      songController.extractArtistFromResponse(results).then((data) => {
+        res.status(200).send(data);
+      });
     }
+
     if (request.video) {
       response = await youtube.search(request.video, "video");
       results = response.content;
-      res.status(200).send(
-        results.map((res) => {
-          return {
-            titolo: res.name,
-            id: res.videoId,
-            artista: res.author,
-            thumbnail: res.thumbnails.url,
-          };
-        })
-      );
+      res.status(200).send(songController.extractVideosFromResponse(results));
     }
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 });
 
-router.options("/video/:videoId", cors());
 /**
  * A partire dal videoId recuperato dalle ricerche,
  * crea uno stream per il video scaricato con youtubedl.
@@ -173,57 +117,39 @@ router.get("/video/:videoId", async (req, res) => {
   }
 });
 
+/**
+ * Endpoint che estrae i brani associati ad una playlist
+ */
 router.get("/getPlaylist/:id", async (req, res) => {
   const id = req.params.id;
   await youtube.initalize();
   const response = await youtube.getPlaylist(id);
-  console.log(response);
-  const result = response.content;
-  res.status(200).send(
-    result.map((res: any) => {
-      return {
-        titolo: res.name,
-        id: res.videoId,
-        artista: res.author.name,
-        thumbnail: res.thumbnails.url,
-      };
-    })
-  );
+  const results = response.content;
+  res.status(200).send(songController.extractSongForPlaylist(results));
 });
 
+/**
+ * Endpoint che estrae i brani associati ad un album
+ */
 router.get("/getAlbum/:id", async (req, res) => {
   const id = req.params.id;
-  console.log(id);
   await youtube.initalize();
   const response = await youtube.getAlbum(id);
-  const result = response.tracks;
-  res.status(200).send(
-    result.map((res: any) => {
-      return {
-        titolo: res.name,
-        id: res.videoId,
-        artista: res.artistNames,
-        thumbnail: res.thumbnails[3] ? res.thumbnails[3].url : null,
-      };
-    })
-  );
+  const results = response.tracks;
+  res.status(200).send(songController.extractSongForAlbum(results));
 });
 
+/**
+ * Endpoint che estrae i brani associati ad un artista
+ */
 router.post("/getSongsByArtist", async (req, res) => {
   const name = req.body.name;
   await youtube.initalize();
   const response = await youtube.search(name, "song");
-  const result = response.content;
-  console.log(result);
-  res.status(200).send(
-    result.map((res: any) => {
-      return {
-        titolo: res.name,
-        id: res.videoId,
-        artista: name,
-        thumbnail: res.thumbnails[0] ? res.thumbnails[0].url : null,
-      };
-    })
-  );
+  const results = response.content;
+  songController.extractSongForArtist(results, name).then((data) => {
+    res.status(200).send(data);
+  });
 });
+
 export default router;
