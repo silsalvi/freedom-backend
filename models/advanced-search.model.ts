@@ -1,3 +1,5 @@
+import { type } from "os";
+
 export interface YoutubeSearch {
   video: string;
   song: string;
@@ -31,3 +33,11 @@ export interface Album {
   year: string;
   thumbnails: any[];
 }
+
+export type TypeSearchSpotify =
+  | "album"
+  | "artist"
+  | "playlist"
+  | "track"
+  | "show"
+  | "episode";

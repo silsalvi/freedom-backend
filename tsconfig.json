@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "./build",
     "esModuleInterop": true,
-    "target": "es5",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "dist"
-  },
-  "lib": ["es2015"],
-  "compileOnSave": true
+    "strict": true
+  }
 }
