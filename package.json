@@ -1,6 +1,6 @@
 {
   "name": "freedom-backend",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Servizio Backend per Web Application di Freedom",
   "main": "dist/server.js",
   "scripts": {
