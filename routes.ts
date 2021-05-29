@@ -111,7 +111,7 @@ router.get("/video/:videoId", async (req, res) => {
       };
       res.status(504).send(error);
     });
-    ytdl(url, { quality: "lowest" }).pipe(res);
+    ytdl(url, { quality: "highestaudio" }).pipe(res);
   } catch (error) {
     res.status(500).send(error);
   }
