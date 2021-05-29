@@ -43,7 +43,7 @@ export class SongController {
     return new Promise((resolve) => {
       const response = results.map((res: any) => {
         const artist = this.getArtistName(res);
-        return this.getMetadataFromQuery(res.name, "album")
+        return this.getMetadataFromQuery(res.name + " " + artist, "track")
           .then((cover) => {
             return {
               titolo: res.name,
