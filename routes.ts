@@ -64,7 +64,6 @@ router.post("/find-brani/advanced", async (req, res) => {
     }
 
     if (request.song) {
-      await youtube.initalize();
       response = await youtube.search(request.song, "song");
       const results = response.content;
       songController.extractSongFromResponse(results).then((response) => {
@@ -112,9 +111,7 @@ router.get("/video/:videoId", async (req, res) => {
       res.status(504).send(error);
     });
     const yt = ytdl(url, { quality: "highestaudio" });
-    yt.once("end", () => {
-      res;
-    });
+
     yt.pipe(res);
   } catch (error) {
     res.status(500).send(error);

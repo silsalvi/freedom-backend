@@ -70,7 +70,6 @@ router.post("/find-brani/advanced", (req, res) => __awaiter(void 0, void 0, void
             res.status(200).send(songController.extractAlbumFromResponse(results));
         }
         if (request.song) {
-            yield youtube.initalize();
             response = yield youtube.search(request.song, "song");
             const results = response.content;
             songController.extractSongFromResponse(results).then((response) => {
@@ -115,9 +114,6 @@ router.get("/video/:videoId", (req, res) => __awaiter(void 0, void 0, void 0, fu
             res.status(504).send(error);
         });
         const yt = ytdl_core_1.default(url, { quality: "highestaudio" });
-        yt.once("end", () => {
-            res;
-        });
         yt.pipe(res);
     }
     catch (error) {

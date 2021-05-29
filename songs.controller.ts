@@ -1,4 +1,3 @@
-import albumArt from "album-art";
 import SpotifyWebApi from "spotify-web-api-node";
 import { TypeSearchSpotify } from "./models/advanced-search.model";
 
@@ -156,7 +155,7 @@ export class SongController {
   extractSongForArtist(results: any[] = [], artistName: string): Promise<any> {
     return new Promise((resolve) => {
       const response = results.map((res: any) => {
-        return this.getMetadataFromQuery(artistName + " " + res.name, "track")
+        return this.getMetadataFromQuery(res.name + " " + artistName, "track")
           .then((cover) => {
             return {
               titolo: res.name,
@@ -187,7 +186,11 @@ export class SongController {
    */
   extractArtistFromResponse(results: any[] = []): Promise<any> {
     return new Promise((resolve) => {
-      const response = results.map((res: any) => {
+      const filtered = Array.from(new Set(results.map((el) => el.name))).map(
+        (name) =>
+          results.find((el) => el.name.toUpperCase() === name.toUpperCase())
+      );
+      const response = filtered.map((res: any) => {
         return this.getMetadataFromQuery(res.name, "artist")
           .then((cover) => {
             return {
@@ -253,10 +256,16 @@ export class SongController {
       const res = await this.spotifyApi.search(query, [typeSearch]);
       switch (typeSearch) {
         case "album": {
-          return res.body.albums?.items[0]?.images[0]?.url;
+          const item = res.body.albums?.items.find((el) =>
+            el.name.toUpperCase().includes(query.toUpperCase())
+          );
+          return item?.images[0]?.url;
         }
         case "artist": {
-          return res.body.artists?.items[0]?.images[0]?.url;
+          const item = res.body.artists?.items.find((el) => {
+            return el.name.toUpperCase() === query.toUpperCase();
+          });
+          return item?.images[0]?.url;
         }
         case "track": {
           return res.body.tracks?.items[0]?.album?.images[0]?.url;

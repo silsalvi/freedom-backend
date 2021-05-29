@@ -154,7 +154,7 @@ class SongController {
     extractSongForArtist(results = [], artistName) {
         return new Promise((resolve) => {
             const response = results.map((res) => {
-                return this.getMetadataFromQuery(artistName + " " + res.name, "track")
+                return this.getMetadataFromQuery(res.name + " " + artistName, "track")
                     .then((cover) => {
                     return {
                         titolo: res.name,
@@ -184,7 +184,8 @@ class SongController {
      */
     extractArtistFromResponse(results = []) {
         return new Promise((resolve) => {
-            const response = results.map((res) => {
+            const filtered = Array.from(new Set(results.map((el) => el.name))).map((name) => results.find((el) => el.name.toUpperCase() === name.toUpperCase()));
+            const response = filtered.map((res) => {
                 return this.getMetadataFromQuery(res.name, "artist")
                     .then((cover) => {
                     return {
@@ -235,19 +236,23 @@ class SongController {
      * @param idArtista - id dell'artista
      */
     getMetadataFromQuery(query, typeSearch) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const res = yield this.spotifyApi.search(query, [typeSearch]);
                 switch (typeSearch) {
                     case "album": {
-                        return (_c = (_b = (_a = res.body.albums) === null || _a === void 0 ? void 0 : _a.items[0]) === null || _b === void 0 ? void 0 : _b.images[0]) === null || _c === void 0 ? void 0 : _c.url;
+                        const item = (_a = res.body.albums) === null || _a === void 0 ? void 0 : _a.items.find((el) => el.name.toUpperCase().includes(query.toUpperCase()));
+                        return (_b = item === null || item === void 0 ? void 0 : item.images[0]) === null || _b === void 0 ? void 0 : _b.url;
                     }
                     case "artist": {
-                        return (_f = (_e = (_d = res.body.artists) === null || _d === void 0 ? void 0 : _d.items[0]) === null || _e === void 0 ? void 0 : _e.images[0]) === null || _f === void 0 ? void 0 : _f.url;
+                        const item = (_c = res.body.artists) === null || _c === void 0 ? void 0 : _c.items.find((el) => {
+                            return el.name.toUpperCase() === query.toUpperCase();
+                        });
+                        return (_d = item === null || item === void 0 ? void 0 : item.images[0]) === null || _d === void 0 ? void 0 : _d.url;
                     }
                     case "track": {
-                        return (_k = (_j = (_h = (_g = res.body.tracks) === null || _g === void 0 ? void 0 : _g.items[0]) === null || _h === void 0 ? void 0 : _h.album) === null || _j === void 0 ? void 0 : _j.images[0]) === null || _k === void 0 ? void 0 : _k.url;
+                        return (_h = (_g = (_f = (_e = res.body.tracks) === null || _e === void 0 ? void 0 : _e.items[0]) === null || _f === void 0 ? void 0 : _f.album) === null || _g === void 0 ? void 0 : _g.images[0]) === null || _h === void 0 ? void 0 : _h.url;
                     }
                 }
             }
