@@ -107,14 +107,18 @@ router.post("/find-brani/advanced", (req, res) => __awaiter(void 0, void 0, void
 router.get("/video/:videoId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const url = YOUTUBE_ENDPOINT + req.params.videoId;
     try {
-        res.setTimeout(20000, () => {
+        res.setTimeout(60000, () => {
             const error = {
                 message: "Il video non è disponibile",
                 status: res.statusCode,
             };
             res.status(504).send(error);
         });
-        ytdl_core_1.default(url, { quality: "highestaudio" }).pipe(res);
+        const yt = ytdl_core_1.default(url, { quality: "highestaudio" });
+        yt.once("end", () => {
+            res;
+        });
+        yt.pipe(res);
     }
     catch (error) {
         res.status(500).send(error);
