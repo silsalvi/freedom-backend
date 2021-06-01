@@ -120,14 +120,31 @@ export class SongController {
    * la response della ricerca da inviare al chiamante.
    * @note Versione usata per ritornare i brani associati ad una playlist.
    */
-  extractSongForPlaylist(results: any[] = []): any[] {
-    return results.map((res: any) => {
-      return {
-        titolo: res.name,
-        id: res.videoId,
-        artista: this.getArtistName(res.author),
-        thumbnail: this.extractBestThumbnail(res.thumbnails),
-      };
+  extractSongForPlaylist(results: any[] = []): Promise<any> {
+    return new Promise((resolve) => {
+      const response = results.map((res: any) => {
+        const artist = this.getArtistName(res);
+        return this.getMetadataFromQuery(res.name + " " + artist, "track")
+          .then((cover) => {
+            return {
+              titolo: res.name,
+              id: res.videoId,
+              artista: artist,
+              thumbnail: cover,
+            };
+          })
+          .catch((err) => {
+            return {
+              titolo: res.name,
+              id: res.videoId,
+              artista: artist,
+              thumbnail: null,
+            };
+          });
+      });
+      Promise.all(response).then((data) => {
+        resolve(data);
+      });
     });
   }
 
@@ -237,8 +254,12 @@ export class SongController {
       return res.artist.name;
     }
 
-    if (res.author) {
-      return res.author;
+    if (!Array.isArray(res.author)) {
+      return res.author.name;
+    }
+
+    if (Array.isArray(res.author)) {
+      return res.author[0].name;
     }
 
     return "";
