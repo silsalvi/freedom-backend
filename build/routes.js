@@ -128,7 +128,9 @@ router.get("/getPlaylist/:id", (req, res) => __awaiter(void 0, void 0, void 0, f
     yield youtube.initalize();
     const response = yield youtube.getPlaylist(id);
     const results = response.content;
-    res.status(200).send(songController.extractSongForPlaylist(results));
+    songController.extractSongForPlaylist(results).then((data) => {
+        res.status(200).send(data);
+    });
 }));
 /**
  * Endpoint che estrae i brani associati ad un album

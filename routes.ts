@@ -126,7 +126,9 @@ router.get("/getPlaylist/:id", async (req, res) => {
   await youtube.initalize();
   const response = await youtube.getPlaylist(id);
   const results = response.content;
-  res.status(200).send(songController.extractSongForPlaylist(results));
+  songController.extractSongForPlaylist(results).then((data) => {
+    res.status(200).send(data);
+  });
 });
 
 /**
