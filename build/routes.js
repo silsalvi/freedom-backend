@@ -103,7 +103,7 @@ router.post("/find-brani/advanced", (req, res) => __awaiter(void 0, void 0, void
  * A partire dal videoId recuperato dalle ricerche,
  * crea uno stream per il video scaricato con youtubedl.
  */
-router.get("/video/:videoId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/video/:videoId", (req, res) => {
     const url = YOUTUBE_ENDPOINT + req.params.videoId;
     try {
         res.setTimeout(60000, () => {
@@ -113,13 +113,19 @@ router.get("/video/:videoId", (req, res) => __awaiter(void 0, void 0, void 0, fu
             };
             res.status(504).send(error);
         });
-        const yt = ytdl_core_1.default(url, { quality: "highestaudio" });
+        res.setHeader("Content-Type", "video/mp4");
+        const yt = ytdl_core_1.default(url, {
+            quality: "highestaudio",
+            dlChunkSize: 0,
+            highWaterMark: 0,
+        });
+        res.status(206);
         yt.pipe(res);
     }
     catch (error) {
         res.status(500).send(error);
     }
-}));
+});
 /**
  * Endpoint che estrae i brani associati ad una playlist
  */
