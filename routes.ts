@@ -100,7 +100,7 @@ router.post("/find-brani/advanced", async (req, res) => {
  * A partire dal videoId recuperato dalle ricerche,
  * crea uno stream per il video scaricato con youtubedl.
  */
-router.get("/video/:videoId", async (req, res) => {
+router.get("/video/:videoId", (req, res) => {
   const url = YOUTUBE_ENDPOINT + req.params.videoId;
   try {
     res.setTimeout(60000, () => {
@@ -110,8 +110,14 @@ router.get("/video/:videoId", async (req, res) => {
       };
       res.status(504).send(error);
     });
-    const yt = ytdl(url, { quality: "highestaudio" });
 
+    res.setHeader("Content-Type", "video/mp4");
+    const yt = ytdl(url, {
+      quality: "highestaudio",
+      dlChunkSize: 0,
+      highWaterMark: 0,
+    });
+    res.status(206);
     yt.pipe(res);
   } catch (error) {
     res.status(500).send(error);
@@ -126,7 +132,9 @@ router.get("/getPlaylist/:id", async (req, res) => {
   await youtube.initalize();
   const response = await youtube.getPlaylist(id);
   const results = response.content;
-  res.status(200).send(songController.extractSongForPlaylist(results));
+  songController.extractSongForPlaylist(results).then((data) => {
+    res.status(200).send(data);
+  });
 });
 
 /**
