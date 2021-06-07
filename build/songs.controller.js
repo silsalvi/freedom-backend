@@ -243,10 +243,10 @@ class SongController {
             typeof res.artist === "object") {
             return res.artist.name;
         }
-        if (!Array.isArray(res.author)) {
+        if (!Array.isArray(res.author) && res.author) {
             return res.author.name;
         }
-        if (Array.isArray(res.author)) {
+        if (Array.isArray(res.author) && res.author) {
             return res.author[0].name;
         }
         return "";

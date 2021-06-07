@@ -254,11 +254,11 @@ export class SongController {
       return res.artist.name;
     }
 
-    if (!Array.isArray(res.author)) {
+    if (!Array.isArray(res.author) && res.author) {
       return res.author.name;
     }
 
-    if (Array.isArray(res.author)) {
+    if (Array.isArray(res.author) && res.author) {
       return res.author[0].name;
     }
 
