@@ -114,12 +114,8 @@ router.get("/video/:videoId", (req, res) => {
             res.status(504).send(error);
         });
         res.setHeader("Content-Type", "video/mp4");
-        const yt = ytdl_core_1.default(url, {
-            quality: "highestaudio",
-            dlChunkSize: 0,
-            highWaterMark: 0,
-        });
-        res.status(206);
+        res.setHeader("Accept-Range", "bytes");
+        const yt = ytdl_core_1.default(url, { quality: "140" });
         yt.pipe(res);
     }
     catch (error) {
