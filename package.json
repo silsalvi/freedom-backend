@@ -19,11 +19,12 @@
   "homepage": "https://github.com/silsalvi/freedom-backend#readme",
   "dependencies": {
     "album-art": "^2.0.2",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "spotify-web-api-node": "^5.0.2",
     "youtube-music-api": "^1.0.6",
-    "ytdl-core": "^4.8.2"
+    "ytdl-core": "^4.8.3"
   },
   "devDependencies": {
     "@types/compression": "^1.7.0",
