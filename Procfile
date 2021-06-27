@@ -1,1 +1,1 @@
-web: node build/server.js
+web: npm install ytdl-core@latest && node build/server.js 
